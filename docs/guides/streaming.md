@@ -404,7 +404,7 @@ Another thing that's not immediately recognizable is if your server can finish l
 
 ### Why not defer everything by default?
 
-The Remix defer API is another lever Remix offers to give you a nice way to choose between trade-offs. Do you want a better TTFB (Time to first byte)? Defer stuff. Do you want a low CLS (Content Layout Shift)? Don't defer stuff. You want a better TTFB, but also want a lower CLS? Defer just the slow and unimportant stuff.
+The Remix defer API is another lever Remix offers to give you a nice way to choose between trade-offs. Do you want a better TTFB (Time to first byte)? Defer stuff. Do you want a lower LCP (Largest Contentful Paint)? Don't defer stuff. You want a better TTFB, but also want a lower LCP? Defer just the slow and unimportant stuff.
 
 It's all trade-offs, and what's neat about the API design is that it's well suited for you to do easy experimentation to see which trade-offs lead to better results for your real-world key indicators.
 
