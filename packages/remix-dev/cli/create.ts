@@ -7,7 +7,7 @@ import fse from "fs-extra";
 import gunzip from "gunzip-maybe";
 import fetch from "node-fetch";
 import ora from "ora";
-import ProxyAgent from "proxy-agent";
+import { ProxyAgent } from "proxy-agent";
 import * as semver from "semver";
 import sortPackageJSON from "sort-package-json";
 import tar from "tar-fs";
@@ -15,7 +15,7 @@ import tar from "tar-fs";
 import * as colors from "../colors";
 import invariant from "../invariant";
 import packageJson from "../package.json";
-import { getPreferredPackageManager } from "./getPreferredPackageManager";
+import { detectPackageManager } from "./detectPackageManager";
 import * as useJavascript from "./useJavascript";
 
 const remixDevPackageVersion = packageJson.version;
@@ -208,7 +208,7 @@ export async function createApp({
   }
 
   if (installDeps) {
-    let packageManager = getPreferredPackageManager();
+    let packageManager = detectPackageManager() ?? "npm";
 
     let npmConfig = execSync(
       `${packageManager} config get @remix-run:registry`,

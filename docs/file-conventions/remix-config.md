@@ -6,7 +6,7 @@ title: remix.config.js
 
 This file has a few build and development configuration options, but does not actually run on your server.
 
-```tsx filename=remix.config.js
+```js filename=remix.config.js
 /** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
   appDirectory: "app",
@@ -27,7 +27,7 @@ module.exports = {
 The path to the `app` directory, relative to remix.config.js. Defaults to
 `"app"`.
 
-```js
+```js filename=remix.config.js
 // default
 exports.appDirectory = "./app";
 
@@ -47,10 +47,18 @@ relative to `remix.config.js`. Defaults to `".cache"`.
 
 ## devServerBroadcastDelay
 
+<docs-warning>This option is deprecated and will likely be removed in a future
+stable release. Enable `v2_dev` to eliminate the race conditions that necessitated
+this option.</docs-warning>
+
 The delay, in milliseconds, before the dev server broadcasts a reload event.
 There is no delay by default.
 
 ## devServerPort
+
+<docs-warning>This option is deprecated and will likely be removed in a future
+stable release. Enable `v2_dev` and use [`--port` / `v2_dev.port` option][port]
+instead.</docs-warning>
 
 The port number to use for the dev websocket server. Defaults to 8002.
 
@@ -66,12 +74,16 @@ dotfiles (like `.DS_Store` files) or CSS/test files you wish to colocate.
 The URL prefix of the browser build with a trailing slash. Defaults to
 `"/build/"`. This is the path the browser will use to find assets.
 
+## postcss
+
+Whether to process CSS using [PostCSS][postcss] if `postcss.config.js` is present. Defaults to `false`.
+
 ## routes
 
 A function for defining custom routes, in addition to those already defined
 using the filesystem convention in `app/routes`. Both sets of routes will be merged.
 
-```tsx
+```js filename=remix.config.js
 exports.routes = async (defineRoutes) => {
   // If you need to do async work, do it before calling `defineRoutes`, we use
   // the call stack of `route` inside to set nesting.
@@ -116,8 +128,7 @@ to `"build/index.js"`.
 
 ## serverBuildTarget
 
-<docs-warning>This option is deprecated and will likely be removed in a future
-stable release. Use a combination of [`publicPath`][public-path],
+<docs-warning>This option is deprecated and will be removed in the next major version release. Use a combination of [`publicPath`][public-path],
 [`serverBuildPath`][server-build-path], [`serverConditions`][server-conditions],
 [`serverDependenciesToBundle`][server-dependencies-to-bundle]
 [`serverMainFields`][server-main-fields], [`serverMinify`][server-minify],
@@ -153,7 +164,7 @@ a `@sindresorhus/slugify` which is ESM-only as well. Here's how you would be
 able to consume those packages in a CJS app without having to use dynamic
 imports:
 
-```ts filename=remix.config.js lines=[8-13]
+```js filename=remix.config.js lines=[8-13]
 /** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
   appDirectory: "app",
@@ -188,16 +199,88 @@ Whether to minify the server build in production or not. Defaults to `false`.
 The output format of the server build, which can either be `"cjs"` or `"esm"`.
 Defaults to `"cjs"`.
 
+## serverNodeBuiltinsPolyfill
+
+The Node.js polyfills to include in the server build when targeting non-Node.js server platforms. Polyfills are provided by [JSPM][jspm] and configured via [esbuild-plugins-node-modules-polyfill].
+
+```js filename=remix.config.js
+exports.serverNodeBuiltinsPolyfill = {
+  modules: {
+    path: true, // Provide a JSPM polyfill
+    fs: "empty", // Provide an empty polyfill
+  },
+};
+```
+
+If left unset, this config defaults to the following set of polyfills for non-Node.js server platforms:
+
+```js filename=remix.config.js
+exports.serverNodeBuiltinsPolyfill = {
+  modules: {
+    _stream_duplex: true,
+    _stream_passthrough: true,
+    _stream_readable: true,
+    _stream_transform: true,
+    _stream_writable: true,
+    assert: true,
+    "assert/strict": true,
+    buffer: true,
+    console: true,
+    constants: true,
+    crypto: "empty",
+    diagnostics_channel: true,
+    domain: true,
+    events: true,
+    fs: "empty",
+    "fs/promises": "empty",
+    http: true,
+    https: true,
+    module: true,
+    os: true,
+    path: true,
+    "path/posix": true,
+    "path/win32": true,
+    perf_hooks: true,
+    process: true,
+    punycode: true,
+    querystring: true,
+    stream: true,
+    "stream/promises": true,
+    "stream/web": true,
+    string_decoder: true,
+    sys: true,
+    timers: true,
+    "timers/promises": true,
+    tty: true,
+    url: true,
+    util: true,
+    "util/types": true,
+    vm: true,
+    wasi: true,
+    worker_threads: true,
+    zlib: true,
+  },
+};
+```
+
+<docs-warning>
+This default behavior is changing in Remix v2 and will no longer polyfill any Node built-in modules on non-Node.js platforms by default.  If your app requires polyfills, you will need to manually specify them via this setting. It's recommend to start manually specifying required polyfills for your app in v1 to ease your eventual migration to v2.
+</docs-warning>
+
 ## serverPlatform
 
 The platform the server build is targeting, which can either be `"neutral"` or
 `"node"`. Defaults to `"node"`.
 
+## tailwind
+
+Whether to support [Tailwind functions and directives][tailwind-functions-and-directives] in CSS files if `tailwindcss` is installed. Defaults to `false`.
+
 ## watchPaths
 
 An array, string, or async function that defines custom directories, relative to the project root, to watch while running [remix dev][remix-dev]. These directories are in addition to [`appDirectory`][app-directory].
 
-```tsx
+```js filename=remix.config.js
 exports.watchPaths = async () => {
   return ["./some/path/*"];
 };
@@ -233,3 +316,8 @@ There are a few conventions that Remix uses you should be aware of.
 [remix-dev]: ../other-api/dev#remix-dev
 [app-directory]: #appDirectory
 [css-side-effect-imports]: ../guides/styling#css-side-effect-imports
+[postcss]: https://postcss.org
+[tailwind-functions-and-directives]: https://tailwindcss.com/docs/functions-and-directives
+[jspm]: https://github.com/jspm/jspm-core
+[esbuild-plugins-node-modules-polyfill]: https://www.npmjs.com/package/esbuild-plugins-node-modules-polyfill
+[port]: ../other-api/dev-v2#options-1

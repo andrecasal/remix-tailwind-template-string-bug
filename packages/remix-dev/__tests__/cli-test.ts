@@ -115,6 +115,13 @@ describe("remix CLI", () => {
           \`dev\` Options:
             --debug             Attach Node.js inspector
             --port, -p          Choose the port from which to run your app
+
+            [v2_dev]
+            --command, -c       Command used to run your app server
+            --manual            Enable manual mode
+            --port              Port for the dev server. Default: any open port
+            --tls-key           Path to TLS key (key.pem)
+            --tls-cert          Path to TLS certificate (cert.pem)
           \`init\` Options:
             --no-delete         Skip deleting the \`remix.init\` script
           \`routes\` Options:
@@ -221,7 +228,7 @@ describe("remix CLI", () => {
       await interactWithShell(proc, [
         { question: /Where.*create.*app/i, type: [projectDir, ENTER] },
         { question: /What type of app/i, answer: /basics/i },
-        { question: /Where.*deploy/i, answer: /express/i },
+        { question: /Where.*deploy/i, answer: /remix/i },
         { question: /typescript or javascript/i, answer: /typescript/i },
         { question: /install/i, type: ["n", ENTER] },
       ]);
@@ -246,7 +253,7 @@ describe("remix CLI", () => {
       await interactWithShell(proc, [
         { question: /Where.*create.*app/i, type: [projectDir, ENTER] },
         { question: /What type of app/i, answer: /basics/i },
-        { question: /Where.*deploy/i, answer: /express/i },
+        { question: /Where.*deploy/i, answer: /remix/i },
         { question: /typescript or javascript/i, answer: /javascript/i },
         { question: /install/i, type: ["n", ENTER] },
       ]);
@@ -280,7 +287,7 @@ function defer() {
 async function interactWithShell(
   proc: childProcess.ChildProcessWithoutNullStreams,
   qAndA: Array<
-    | { question: RegExp; type: Array<String>; answer?: never }
+    | { question: RegExp; type: Array<string>; answer?: never }
     | { question: RegExp; answer: RegExp; type?: never }
   >
 ) {
